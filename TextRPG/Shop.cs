@@ -11,29 +11,48 @@ namespace TextRPG
 {
     internal class Shop
     {
-        //후에 개별 참조를 위해 따로 변수 선언
-        static ShopItem old_sword = new ShopItem("낡은 검", ItemType.Weapon, 5, 0, "쉽게 볼 수 있는 낡은 검 입니다.", 600);
-        static ShopItem bronze_ax = new ShopItem("청동 도끼", ItemType.Weapon, 7, 0, "어디선가 사용됐던거 같은 도끼입니다.", 1500);
+        // 문자열 너비 계산 함수 (한글은 2, 나머지는 1로 계산)
+        int GetDisplayWidth(string text)
+        {
+            int width = 0;
+            foreach (char c in text)
+            {
+                width += (c >= 0xAC00 && c <= 0xD7A3) ? 2 : 1; // 한글 유니코드 범위
+            }
+            return width;
+        }
+
+        // 너비 보정 함수
+        string PadRightDisplay(string text, int totalWidth)
+        {
+            int padding = totalWidth - GetDisplayWidth(text);
+            return text + new string(' ', Math.Max(0, padding));
+        }
+
+        //상점에서 판매할 아이템들을 개별 변수로 선언 (후에 개별 참조를 위해)
+        static ShopItem old_sword = new ShopItem("낡은 검", ItemType.Weapon, 3, 0, "쉽게 볼 수 있는 낡은 검 입니다.", 600);
+        static ShopItem bronze_ax = new ShopItem("청동 도끼", ItemType.Weapon, 6, 0, "어디선가 사용됐던거 같은 도끼입니다.", 1500);
         static ShopItem sparta_spear = new ShopItem("스파르타의 창", ItemType.Weapon, 10, 0, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 3000);
 
         static ShopItem double_dagger = new ShopItem("이중 단검", ItemType.Weapon, 12, 0, "두 개의 단검으로 빠른 연속 공격이 가능합니다.", 3500);
         static ShopItem mana_staff = new ShopItem("마나 지팡이", ItemType.Weapon, 14, 0, "마력을 증폭시켜주는 전용 지팡이입니다.", 3800);
         static ShopItem precisior_bow = new ShopItem("정확의 활", ItemType.Weapon, 15, 0, "한 발 한 발이 치명적인 정밀 활입니다.", 4000);
 
-        static ShopItem novice_armor = new ShopItem("수련자 갑옷", ItemType.Armor, 0, 5, "수련에 도움을 주는 갑옷입니다.", 1000);
-        static ShopItem iron_armor = new ShopItem("무쇠 갑옷", ItemType.Armor, 0, 9, "무쇠로 만들어져 튼튼한 갑옷입니다.", 2000);
-        static ShopItem sparta_armor = new ShopItem("스파르타의 갑옷", ItemType.Armor, 0, 17, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 3500);
+        static ShopItem novice_armor = new ShopItem("수련자 갑옷", ItemType.Armor, 0, 4, "수련에 도움을 주는 갑옷입니다.", 1000);
+        static ShopItem iron_armor = new ShopItem("무쇠 갑옷", ItemType.Armor, 0, 6, "무쇠로 만들어져 튼튼한 갑옷입니다.", 2000);
+        static ShopItem sparta_armor = new ShopItem("스파르타의 갑옷", ItemType.Armor, 0, 12, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 3000);
 
         static ShopItem agility_vest = new ShopItem("민첩의 조끼", ItemType.Armor, 0, 12, "움직임을 방해하지 않는 가벼운 조끼입니다.", 3000);
-        static ShopItem hunter_clothes = new ShopItem("사냥꾼의 가죽옷", ItemType.Armor, 0, 15, "기동성과 방어력을 겸비한 가죽옷입니다.", 3200);
-        static ShopItem magic_robe = new ShopItem("마법 로브", ItemType.Armor, 0, 17, "마법 방어에 특화된 마도사의 로브입니다.", 3500);
+        static ShopItem hunter_clothes = new ShopItem("사냥꾼의 가죽옷", ItemType.Armor, 0, 13, "기동성과 방어력을 겸비한 가죽옷입니다.", 3200);
+        static ShopItem magic_robe = new ShopItem("마법 로브", ItemType.Armor, 0, 15, "마법 방어에 특화된 마도사의 로브입니다.", 3500);
 
-
+        // 상점에 등록된 아이템 리스트
         static List<ShopItem> shopItems = new List<ShopItem>()
         {
             old_sword, bronze_ax, sparta_spear, double_dagger, mana_staff, precisior_bow, novice_armor, iron_armor, sparta_armor, agility_vest, hunter_clothes, magic_robe
         };
 
+        //상점 입장
         public static void OpenShop()
         {
             while (true)
@@ -45,8 +64,9 @@ namespace TextRPG
                 Console.WriteLine($"[보유 골드] {Game.player.Gold} G\n");
                 Console.WriteLine("[아이템 목록]");
 
+                //아이템 정보 출력
                 Console.WriteLine($"{"번호",-4} {"이름",-15} {"효과",-12} {"설명",-40} {"가격"}");
-                Console.WriteLine(new string('-', 80));
+                Console.WriteLine(new string('-', 90));
 
                 for (int i = 0; i < shopItems.Count; i++)
                 {
@@ -54,9 +74,10 @@ namespace TextRPG
                     string status = item.IsPurchased ? "구매완료" : $"{item.Price} G";
                     string bonus = item.Attack > 0 ? $"공격력 +{item.Attack}" : $"방어력 +{item.Defense}";
 
-                    Console.WriteLine($"- {i + 1,-4} {item.Name,-15} {bonus,-12} {item.Description,-40} {status}");
+                    Console.WriteLine($"- {i + 1,-4} {item.Name,-15} {bonus,-12} {item.Description,-40} {status,8}");
                 }
 
+                //메뉴 선택
                 Console.WriteLine("\n1. 아이템 구매");
                 Console.WriteLine("2. 아이템 판매");
                 Console.WriteLine("0. 나가기");
@@ -66,13 +87,13 @@ namespace TextRPG
                 switch (input)
                 {
                     case "0":
-                        Game.EnterVillage();
+                        Game.EnterVillage(); //마을로 돌아가기
                         break;
                     case "1":
-                        BuyItem();
+                        BuyItem(); //아이템 구매
                         break;
                     case "2":
-                        SellItem();
+                        SellItem(); //아이템 판매
                         break;
                     default:
                         Console.WriteLine("\n잘못된 입력입니다. 아무 키나 눌러 계속...");
@@ -82,6 +103,8 @@ namespace TextRPG
                 break;
             }
         }
+
+        //아이템 구매
         static void BuyItem()
         {
             while (true)
@@ -90,6 +113,7 @@ namespace TextRPG
                 Console.WriteLine("상점 - 아이템 구매\n");
                 Console.WriteLine($"[보유 골드] {Game.player.Gold} G\n");
 
+                // 아이템 목록 출력
                 for (int i = 0; i < shopItems.Count; i++)
                 {
                     var item = shopItems[i];
@@ -109,11 +133,13 @@ namespace TextRPG
                 {
                     var selectedItem = shopItems[index - 1];
 
+                    //이미 구매한 경우
                     if (selectedItem.IsPurchased)
                     {
                         Console.WriteLine("\n이미 구매한 아이템입니다.");
                         Console.ReadKey();
                     }
+                    //구매성공
                     else if (Game.player.Gold >= selectedItem.Price)
                     {
                         selectedItem.IsPurchased = true;
@@ -121,6 +147,7 @@ namespace TextRPG
                         Game.player.Inventory.Add(selectedItem); // 인벤토리에 추가
                         Console.WriteLine($"\n{selectedItem.Name}을(를) 구매했습니다!");
                     }
+                    //골드 부족
                     else
                     {
                         Console.WriteLine("\nGold가 부족합니다.");
@@ -134,6 +161,7 @@ namespace TextRPG
                 }
             }
         }
+        //아이템 판매 처리
         static void SellItem()
         {
             while (true)
@@ -142,12 +170,14 @@ namespace TextRPG
                 Console.WriteLine("상점 - 아이템 판매\n");
                 Console.WriteLine($"[보유 골드] {Game.player.Gold} G\n");
 
+                //이벤토리가 비었는지 확인
                 if (Game.player.Inventory.Count == 0)
                 {
                     Console.WriteLine("판매할 아이템이 없습니다.");
                     Console.ReadKey();
                 }
 
+                //인벤토리 출력
                 for (int i = 0; i < Game.player.Inventory.Count; i++)
                 {
                     var item = Game.player.Inventory[i];

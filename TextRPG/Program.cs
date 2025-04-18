@@ -12,6 +12,7 @@ namespace TextRPG
     {
         static void Main(string[] args)
         {
+            //게임 시작. Game클래스의 Start() 메서드 호출
             Game.Start();
         }
 

@@ -9,6 +9,7 @@ namespace TextRPG
 {
     public static class Inventory
     {
+        //인벤토리 열기
         public static void OpenInventory()
         {
             while (true)
@@ -16,15 +17,17 @@ namespace TextRPG
                 Console.Clear();
                 Console.WriteLine("인벤토리\n");
 
+                //아이템이 없을 경우
                 if (Game.player.Inventory.Count == 0)
                 {
                     Console.WriteLine("보유 중인 아이템이 없습니다.");
                 }
-                else
+                else //아이템이 존재할 경우
                 {
+                    //아이템 리스트 출력
                     foreach (var item in Game.player.Inventory)
                     {
-                        string equippedMark = item.IsEquipped ? "[E] " : "";
+                        string equippedMark = item.IsEquipped ? "[E] " : "";    //장착 표시
                         string statText = item.Attack > 0 ? $"공격력 +{item.Attack}" :
                                           item.Defense > 0 ? $"방어력 +{item.Defense}" : "스탯 없음";
                         Console.WriteLine($"- {equippedMark} {item.Name,-16} | {statText,-14} | {item.Description,-40} ");
@@ -40,10 +43,10 @@ namespace TextRPG
                 switch (input)
                 {
                     case "0":
-                        Game.EnterVillage();
+                        Game.EnterVillage(); //마을로 돌아가기
                         break;
                     case "1":
-                        Equipped();
+                        Equipped(); //장착 관리
                         break;
                     default:
                         Console.WriteLine("\n잘못된 입력입니다. 아무 키나 눌러 계속...");
@@ -54,6 +57,8 @@ namespace TextRPG
             }
         }
 
+
+        //장착/해체 관리 기능
         static void Equipped()
         {
             while (true)
@@ -67,7 +72,7 @@ namespace TextRPG
                 }
                 else
                 {
-                    for (int i = 0; i < Game.player.Inventory.Count; i++)
+                    for (int i = 0; i < Game.player.Inventory.Count; i++) //인덱스 번호와 함께 장착 상태 출력
                     {
                         var item = Game.player.Inventory[i];
                         string equippedMark = item.IsEquipped ? "[E] " : "";
@@ -80,10 +85,13 @@ namespace TextRPG
                 Console.Write("\n장착/해제할 아이템 번호를 선택하세요.\n>> ");
                 string inputNum = Console.ReadLine();
                 
+                //나가기
                 if (inputNum == "0") Game.EnterVillage();
 
+                //숫자 입력인지 체크
                 if (int.TryParse(inputNum, out int choice))
                 {
+                    //인벤토리에 존재하지 않는 번호인 경우
                     if (choice < 1 || choice > Game.player.Inventory.Count)
                     {
                         Console.WriteLine("\n잘못된 번호입니다. 아무 키나 눌러 계속...");
@@ -93,6 +101,7 @@ namespace TextRPG
                     {
                         var selectedItem = Game.player.Inventory[choice - 1];
 
+                        //장착되지 않은 경우 -> 장착
                         if (!selectedItem.IsEquipped)
                         {
                             Console.WriteLine($"\n{selectedItem.Name}을(를) 장착하시겠습니까? (y/n)");
@@ -113,6 +122,7 @@ namespace TextRPG
                                     }
                                 }
 
+                                //선택한 아이템 장착
                                 selectedItem.IsEquipped = true;
 
                                 Game.player.BonusAtk += selectedItem.Attack;
@@ -122,7 +132,7 @@ namespace TextRPG
                                 Console.ReadKey();
                             }
                         }
-                        else
+                        else //이미 장착된 경우 -> 해제
                         {
                             Console.WriteLine($"\n{selectedItem.Name}을(를) 장착 해제하시겠습니까? (y/n)");
                             Console.Write(">> ");
@@ -141,7 +151,7 @@ namespace TextRPG
                         }
                     }
                 }
-                else
+                else //숫자가 아닌 경우
                 {
                     Console.WriteLine("\n숫자를 정확히 입력해주세요. 아무 키나 눌러 계속...");
                     Console.ReadKey();
